@@ -35,7 +35,7 @@ A **Price Intel Assistant** — a Telegram bot that takes a product query, fetch
 
 ## Guide
 
-→ [Full step-by-step guide](guide-draft.md)
+→ [Full step-by-step guide](guide.md)
 
 Covers: Docker install, NemoClaw install + onboarding wizard, Nebius Token Factory configuration, Telegram setup, agent verification, and known issues.
 
