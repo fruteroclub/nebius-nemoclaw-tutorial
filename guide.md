@@ -139,7 +139,9 @@ Select **3**, then enter:
 
 - **Base URL:** `https://api.tokenfactory.nebius.com/v1`
 - **API key:** your Nebius Token Factory API key
-- **Model:** `nvidia/Llama-3_1-Nemotron-Ultra-253B-v1`
+- **Model:** `deepseek-ai/DeepSeek-V3.2`
+
+> ⚠️ **Why not Nemotron?** All three NVIDIA Nemotron models on Nebius Token Factory are reasoning models — they return responses in `reasoning_content` instead of `content`. NemoClaw's Option 3 path expects standard `content` responses and has no way to detect reasoning models from third-party wrappers. This causes the smoke check to fail and tool calls to return 400. Use `deepseek-ai/DeepSeek-V3.2` or another non-reasoning model. See the [compatibility notes](#model-compatibility-with-nemoclaw--nebius-token-factory) for the full breakdown.
 
 > ℹ️ The wizard sends a live inference probe to validate your endpoint. You'll see:
 > `ℹ Responses API streaming is missing required events: response.output_text.delta. Falling back to chat completions API.`
@@ -169,7 +171,7 @@ When onboarding completes, you'll see:
 
 ```
 Sandbox      price-intel (Landlock + seccomp + netns)
-Model        nvidia/Llama-3_1-Nemotron-Ultra-253B-v1 (Other OpenAI-compatible endpoint)
+Model        deepseek-ai/DeepSeek-V3.2 (Other OpenAI-compatible endpoint)
 
 Run:         nemoclaw price-intel connect
 Status:      nemoclaw price-intel status
@@ -180,7 +182,7 @@ Logs:        nemoclaw price-intel logs --follow
 
 ---
 
-## Step 4 — Verify Nebius is serving inference
+## Step 4 — Fix Telegram and verify inference
 
 Connect to the sandbox:
 
@@ -188,7 +190,16 @@ Connect to the sandbox:
 nemoclaw price-intel connect
 ```
 
-Inside the sandbox, send a test message:
+**Apply the Telegram gateway fix** — do this before testing anything. The NemoClaw wizard writes an invalid `groupPolicy` value (`"mentions"`) that crashes the gateway on startup, silently killing the Telegram bridge. CLI inference still works because it bypasses the gateway, but Telegram won't respond until this is patched:
+
+```bash
+sed -i 's/"groupPolicy": "mentions"/"groupPolicy": "allowlist"/' ~/.openclaw/openclaw.json
+nohup openclaw gateway > /tmp/gateway.log 2>&1 &
+```
+
+> ⚠️ This fix does not survive a sandbox rebuild. Re-apply it every time you reconnect after a rebuild. See [ISSUE-001](issues.md#issue-001--telegram-wizard-writes-invalid-grouppolicy-value) for the full details and status.
+
+Now send a test message:
 
 ```bash
 openclaw agent --agent main -m "hello"
