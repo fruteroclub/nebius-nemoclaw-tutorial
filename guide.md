@@ -1,12 +1,10 @@
-# Guide Draft — NemoClaw + Nebius Token Factory Tutorial
+# NemoClaw + Nebius Token Factory — Full Guide
 
-> Working draft. Steps are added as verified on the reference host (EC2 m7i.xlarge, Ubuntu 24.04). Do not publish until end-to-end run is complete.
+> Verified on EC2 m7i.xlarge, Ubuntu 24.04 LTS — 2026-05-06
 
 ---
 
 ## Model compatibility with NemoClaw + Nebius Token Factory
-
-> ⚠️ **Flag for Nebius team:** This section documents a compatibility gap discovered during tutorial development. Please review before publishing.
 
 NemoClaw's **Option 3 (Other OpenAI-compatible endpoint)** path hardcodes `NEMOCLAW_REASONING=false` in the sandbox build. It cannot detect whether the model behind the endpoint is a reasoning model — it always expects standard `choices[0].message.content` responses.
 
@@ -31,8 +29,6 @@ NemoClaw's **Option 3 (Other OpenAI-compatible endpoint)** path hardcodes `NEMOC
 **Recommendation for Nebius team:** expose a non-reasoning inference mode for Nemotron models via the OpenAI-compatible endpoint, or document this limitation in the Token Factory + NemoClaw integration guide.
 
 ### Known issue: NemoClaw wizard writes invalid Telegram groupPolicy
-
-> ⚠️ **Flag for NVIDIA/NemoClaw team.**
 
 During `nemoclaw onboard`, the prompt "Reply only when @mentioned? [Y/n]" writes `"groupPolicy": "mentions"` into the sandbox config. OpenClaw does not accept `"mentions"` — valid values are `"open"`, `"disabled"`, and `"allowlist"`. The gateway process validates the config on startup and exits immediately on finding an invalid value, silently killing the Telegram bridge.
 
